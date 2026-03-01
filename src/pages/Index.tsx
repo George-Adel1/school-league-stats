@@ -1,87 +1,121 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Users, Shield, Calendar, Swords, Layers, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
+import MatchCard from "@/components/MatchCard";
+import StandingsTable from "@/components/StandingsTable";
+import { Swords, Trophy } from "lucide-react";
 
-interface CountCard { label: string; count: number; icon: React.ElementType; }
+interface MatchWithTeams {
+  id: string;
+  date: string;
+  team1: { name: string } | null;
+  team2: { name: string } | null;
+  team_match_stats?: { team_id: string; goals_scored: number; goals_against: number }[];
+}
+
+interface StandingRow {
+  rank: number;
+  teamName: string;
+  wins: number;
+  draws: number;
+  losses: number;
+  points: number;
+  goalDiff: number;
+}
 
 const Dashboard = () => {
-  const [counts, setCounts] = useState<CountCard[]>([]);
+  const [matches, setMatches] = useState<MatchWithTeams[]>([]);
+  const [standings, setStandings] = useState<StandingRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCounts = async () => {
-      const tables = [
-        { table: "seasons", label: "Seasons", icon: Calendar },
-        { table: "groups", label: "Groups", icon: Layers },
-        { table: "teams", label: "Teams", icon: Shield },
-        { table: "players", label: "Players", icon: Users },
-        { table: "gameweeks", label: "Game Weeks", icon: Calendar },
-        { table: "matches", label: "Matches", icon: Swords },
-      ] as const;
+    const fetchAll = async () => {
+      const [mRes, sRes] = await Promise.all([
+        supabase
+          .from("matches")
+          .select("id, date, team1:teams!matches_team1_id_fkey(name), team2:teams!matches_team2_id_fkey(name)")
+          .order("date", { ascending: false })
+          .limit(6),
+        supabase
+          .from("team_season_stats")
+          .select("*, teams(name)")
+          .order("total_points", { ascending: false }),
+      ]);
 
-      const results = await Promise.all(
-        tables.map(t => supabase.from(t.table).select("id", { count: "exact", head: true }))
+      setMatches((mRes.data as any) || []);
+
+      const sData = (sRes.data || []) as any[];
+      setStandings(
+        sData.map((s, i) => ({
+          rank: i + 1,
+          teamName: s.teams?.name ?? "Unknown",
+          wins: s.wins,
+          draws: s.draws,
+          losses: s.losses,
+          points: s.total_points,
+          goalDiff: s.goals_scored - s.goals_conceded,
+        }))
       );
-
-      setCounts(tables.map((t, i) => ({
-        label: t.label,
-        count: results[i].count ?? 0,
-        icon: t.icon,
-      })));
       setLoading(false);
     };
-    fetchCounts();
+    fetchAll();
   }, []);
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-          <Trophy className="w-5 h-5 text-primary-foreground" />
+      {/* Hero Banner */}
+      <div className="surface-dark rounded-xl p-6 md:p-8">
+        <h1 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide">
+          Your Don Bosco Football Digital Stream
+        </h1>
+        <p className="text-sm mt-2 opacity-70 max-w-lg">
+          Track real match performance, climb the standings, and see your name on the leaderboard inside the official Don Bosco League System.
+        </p>
+      </div>
+
+      <div className="grid lg:grid-cols-[1fr_380px] gap-6">
+        {/* Left: Upcoming Matches */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold uppercase flex items-center gap-2">
+              <Swords className="w-4 h-4 text-primary" />
+              Upcoming Matches
+            </h2>
+            <Link to="/matches" className="text-xs text-primary hover:underline font-medium">
+              View All
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="glass-card h-[120px] animate-pulse" />
+              ))}
+            </div>
+          ) : matches.length === 0 ? (
+            <div className="glass-card p-8 text-center text-muted-foreground text-sm">
+              No matches yet. Add matches from the admin panel.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              {matches.map((m) => (
+                <Link key={m.id} to={`/matches/${m.id}`}>
+                  <MatchCard
+                    team1Name={m.team1?.name ?? "TBD"}
+                    team2Name={m.team2?.name ?? "TBD"}
+                    date={m.date}
+                    time="5:30 PM"
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Right: Standings */}
         <div>
-          <h1 className="text-2xl font-bold">Fantasy League Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Optimized database — no redundant or derived columns stored</p>
+          <StandingsTable data={standings} loading={loading} />
         </div>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {loading ? (
-          Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="animate-pulse"><CardContent className="p-4 h-20" /></Card>
-          ))
-        ) : (
-          counts.map(c => (
-            <Card key={c.label} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4 flex flex-col items-center gap-2">
-                <c.icon className="w-5 h-5 text-primary" />
-                <p className="text-2xl font-bold">{c.count}</p>
-                <p className="text-xs text-muted-foreground">{c.label}</p>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-primary" />Optimization Notes</CardTitle></CardHeader>
-          <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p>✅ <strong>Match scores</strong> stored only in <code className="bg-muted px-1 rounded">team_match_stats</code> (removed from matches)</p>
-            <p>✅ <strong>Goal difference</strong> calculated dynamically as <code className="bg-muted px-1 rounded">goals_scored - goals_conceded</code></p>
-            <p>✅ <strong>Match result</strong> derived from <code className="bg-muted px-1 rounded">goals_scored vs goals_against</code></p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="w-4 h-4 text-primary" />Schema Info</CardTitle></CardHeader>
-          <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p>📊 <strong>10 tables</strong> with full referential integrity</p>
-            <p>🔑 All foreign keys with <code className="bg-muted px-1 rounded">ON DELETE CASCADE</code></p>
-            <p>🔒 Row-level security enabled on all tables</p>
-            <p>🚫 Zero redundant or derived columns in storage</p>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
