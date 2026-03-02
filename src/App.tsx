@@ -14,7 +14,6 @@ import TeamsPage from "./pages/Teams";
 import PlayersPage from "./pages/Players";
 import GameWeeksPage from "./pages/GameWeeks";
 import MatchesPage from "./pages/Matches";
-import MatchDetail from "./pages/MatchDetail";
 import StatsPage from "./pages/Stats";
 
 const queryClient = new QueryClient();
@@ -22,7 +21,7 @@ const queryClient = new QueryClient();
 const AppRoutes = () => {
   const { session, loading } = useAuth();
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground font-display uppercase tracking-wider">Loading...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading...</div>;
   if (!session) return <Auth />;
 
   return (
@@ -35,7 +34,6 @@ const AppRoutes = () => {
         <Route path="/players" element={<PlayersPage />} />
         <Route path="/gameweeks" element={<GameWeeksPage />} />
         <Route path="/matches" element={<MatchesPage />} />
-        <Route path="/matches/:id" element={<MatchDetail />} />
         <Route path="/stats" element={<StatsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

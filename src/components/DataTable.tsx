@@ -20,43 +20,41 @@ interface DataTableProps<T> {
 
 const DataTable = <T extends { id: string }>({ title, columns, data, onAdd, onEdit, onDelete, loading }: DataTableProps<T>) => {
   return (
-    <div className="animate-fade-in space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-display text-xl font-bold uppercase">{title}</h2>
-        <Button onClick={onAdd} size="sm" className="gap-1">
-          <Plus className="w-3.5 h-3.5" /> Add
-        </Button>
+    <div className="animate-fade-in">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold">{title}</h2>
+        <Button onClick={onAdd} size="sm"><Plus className="w-4 h-4 mr-1" />Add</Button>
       </div>
-      <div className="glass-card overflow-hidden">
+      <div className="border rounded-lg overflow-hidden bg-card">
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-border">
+            <TableRow className="bg-muted/50">
               {columns.map(col => (
-                <TableHead key={col.key} className="font-semibold text-xs uppercase text-muted-foreground tracking-wider">{col.label}</TableHead>
+                <TableHead key={col.key} className="font-semibold">{col.label}</TableHead>
               ))}
-              <TableHead className="w-20 text-xs uppercase text-muted-foreground tracking-wider">Actions</TableHead>
+              <TableHead className="w-24">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow><TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
             ) : data.length === 0 ? (
-              <TableRow><TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground text-sm">No data yet</TableCell></TableRow>
+              <TableRow><TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">No data yet</TableCell></TableRow>
             ) : (
               data.map(item => (
-                <TableRow key={item.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">
                   {columns.map(col => (
-                    <TableCell key={col.key} className="text-sm">
+                    <TableCell key={col.key}>
                       {col.render ? col.render(item) : (item as any)[col.key]}
                     </TableCell>
                   ))}
                   <TableCell>
-                    <div className="flex gap-0.5">
-                      <Button variant="ghost" size="icon" onClick={() => onEdit(item)} className="h-7 w-7">
-                        <Pencil className="w-3 h-3" />
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => onEdit(item)} className="h-8 w-8">
+                        <Pencil className="w-3.5 h-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => onDelete(item)} className="h-7 w-7 text-destructive hover:text-destructive">
-                        <Trash2 className="w-3 h-3" />
+                      <Button variant="ghost" size="icon" onClick={() => onDelete(item)} className="h-8 w-8 text-destructive hover:text-destructive">
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
                   </TableCell>
