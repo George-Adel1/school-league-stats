@@ -8,14 +8,14 @@ import {
 import { useState } from "react";
 
 const navItems = [
-  { path: "/", label: "Dashboard", icon: Home },
-  { path: "/seasons", label: "Seasons", icon: Calendar },
-  { path: "/groups", label: "Groups", icon: Layers },
-  { path: "/teams", label: "Teams", icon: Shield },
-  { path: "/players", label: "Players", icon: Users },
-  { path: "/gameweeks", label: "Game Weeks", icon: Calendar },
-  { path: "/matches", label: "Matches", icon: Swords },
-  { path: "/stats", label: "Stats", icon: BarChart3 },
+  { path: "/admin/dashboard", label: "Dashboard", icon: Home },
+  { path: "/admin/seasons", label: "Seasons", icon: Calendar },
+  { path: "/admin/groups", label: "Groups", icon: Layers },
+  { path: "/admin/teams", label: "Teams", icon: Shield },
+  { path: "/admin/players", label: "Players", icon: Users },
+  { path: "/admin/gameweeks", label: "Game Weeks", icon: Calendar },
+  { path: "/admin/matches", label: "Matches", icon: Swords },
+  { path: "/admin/stats", label: "Stats", icon: BarChart3 },
 ];
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
