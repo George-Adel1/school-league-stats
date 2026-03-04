@@ -32,6 +32,7 @@ import PublicMatchesPage from "./pages/public/PublicMatchesPage";
 import MatchDetailPage from "./pages/public/MatchDetailPage";
 import PublicPlayersPage from "./pages/public/PublicPlayersPage";
 import PlayerDetailPage from "./pages/public/PlayerDetailPage";
+import ProfilePage from "./pages/public/ProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -79,7 +80,7 @@ const AppRoutes = () => {
       <Route path="/matches/:id" element={<PublicLayout><MatchDetailPage /></PublicLayout>} />
       <Route path="/players" element={<PublicLayout><PublicPlayersPage /></PublicLayout>} />
       <Route path="/players/:id" element={<PublicLayout><PlayerDetailPage /></PublicLayout>} />
-
+      <Route path="/profile" element={<PublicLayout><ProfilePage /></PublicLayout>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

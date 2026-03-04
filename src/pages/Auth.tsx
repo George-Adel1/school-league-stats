@@ -5,19 +5,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy } from "lucide-react";
+import { Trophy, CheckCircle } from "lucide-react";
+
+const ALLOWED_DOMAIN = "@donboscocairo.org";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      if (!isLogin && !email.toLowerCase().endsWith(ALLOWED_DOMAIN)) {
+        throw new Error(`Only emails ending with ${ALLOWED_DOMAIN} are allowed to sign up.`);
+      }
+
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -28,7 +35,7 @@ const Auth = () => {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
-        toast({ title: "Check your email", description: "We sent you a confirmation link." });
+        setSignupSuccess(true);
       }
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -37,6 +44,29 @@ const Auth = () => {
     }
   };
 
+  if (signupSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-md animate-fade-in">
+          <CardHeader className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 rounded-lg bg-[#00c853] flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-black" />
+            </div>
+            <CardTitle className="text-2xl">Check Your Email</CardTitle>
+            <CardDescription className="text-base">
+              Please check your school email to verify your account before logging in.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button className="w-full" variant="outline" onClick={() => { setSignupSuccess(false); setIsLogin(true); }}>
+              Back to Sign In
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md animate-fade-in">
@@ -44,14 +74,15 @@ const Auth = () => {
           <div className="mx-auto w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
             <Trophy className="w-6 h-6 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl">Fantasy League DB</CardTitle>
-          <CardDescription>{isLogin ? "Sign in to manage your league" : "Create an admin account"}</CardDescription>
+          <CardTitle className="text-2xl">Goal Bosco</CardTitle>
+          <CardDescription>{isLogin ? "Sign in to your account" : "Create your student account"}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+              <Label htmlFor="email">School Email</Label>
+              <Input id="email" type="email" placeholder={`name${ALLOWED_DOMAIN}`} value={email} onChange={e => setEmail(e.target.value)} required />
+              {!isLogin && <p className="text-xs text-muted-foreground">Only {ALLOWED_DOMAIN} emails are accepted.</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
