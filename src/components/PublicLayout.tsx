@@ -1,5 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
-import { Trophy, BarChart3, Swords, Users, Home } from "lucide-react";
+import { Trophy, BarChart3, Swords, Users, Home, LogOut, User, ChevronDown } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navItems = [
   { path: "/main", label: "Home", icon: Home },
@@ -10,6 +19,8 @@ const navItems = [
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+  const { session, signOut } = useAuth();
+  const { displayName } = useProfile();
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -50,6 +61,33 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                 </Link>
               );
             })}
+
+            {/* User dropdown */}
+            {session && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-[#888] hover:text-white hover:bg-[#1a1a1a] transition-colors ml-2 outline-none">
+                  <User className="w-4 h-4" />
+                  <span className="hidden md:inline max-w-[120px] truncate">{displayName ?? "Account"}</span>
+                  <ChevronDown className="w-3 h-3" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-[#1a1a1a] border-[#2a2a2a] text-white min-w-[180px]">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{displayName ?? "User"}</p>
+                    <p className="text-xs text-[#888] truncate">{session.user.email}</p>
+                  </div>
+                  <DropdownMenuSeparator className="bg-[#2a2a2a]" />
+                  <DropdownMenuItem asChild className="cursor-pointer focus:bg-[#2a2a2a] focus:text-white">
+                    <Link to="/profile" className="flex items-center gap-2">
+                      <User className="w-4 h-4" /> Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-[#2a2a2a]" />
+                  <DropdownMenuItem onClick={signOut} className="cursor-pointer focus:bg-[#2a2a2a] focus:text-white">
+                    <LogOut className="w-4 h-4 mr-2" /> Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </nav>
