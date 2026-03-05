@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   Trophy, Users, Shield, Calendar, Swords, BarChart3,
-  LogOut, ChevronLeft, ChevronRight, Home, Layers
+  LogOut, ChevronLeft, ChevronRight, Home, Layers, Newspaper
 } from "lucide-react";
 import { useState } from "react";
 
@@ -16,6 +16,7 @@ const navItems = [
   { path: "/admin/gameweeks", label: "Game Weeks", icon: Calendar },
   { path: "/admin/matches", label: "Matches", icon: Swords },
   { path: "/admin/stats", label: "Stats", icon: BarChart3 },
+  { path: "/admin/announcements", label: "News", icon: Newspaper },
 ];
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {

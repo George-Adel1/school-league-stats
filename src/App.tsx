@@ -24,6 +24,7 @@ import PlayersPage from "./pages/Players";
 import GameWeeksPage from "./pages/GameWeeks";
 import MatchesPage from "./pages/Matches";
 import StatsPage from "./pages/Stats";
+import AnnouncementsPage from "./pages/Announcements";
 
 // Public pages
 import MainPage from "./pages/public/MainPage";
@@ -67,6 +68,7 @@ const AppRoutes = () => {
               <Route path="gameweeks" element={<GameWeeksPage />} />
               <Route path="matches" element={<MatchesPage />} />
               <Route path="stats" element={<StatsPage />} />
+              <Route path="announcements" element={<AnnouncementsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
