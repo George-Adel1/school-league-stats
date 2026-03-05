@@ -115,6 +115,12 @@ export default {
   			'fade-in': 'fade-in 0.3s ease-out'
   		},
   		fontFamily: {
+  			display: [
+  				'Bebas Neue',
+  				'ui-sans-serif',
+  				'system-ui',
+  				'sans-serif'
+  			],
   			sans: [
   				'Space Grotesk',
   				'ui-sans-serif',
