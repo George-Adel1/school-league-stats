@@ -5,11 +5,12 @@ import DataTable, { Column } from "@/components/DataTable";
 import FormDialog from "@/components/FormDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface PMS { id: string; player_id: string; match_id: string; goals: number; assists: number; clean_sheets: number; yellow_cards: number; red_cards: number; own_goals: number; total_saves: number; penalties_saved: number; penalties_missed: number; minutes_played: number; players?: { name: string; last_name: string }; matches?: { date: string } }
+interface PMS { id: string; player_id: string; match_id: string; goals: number; assists: number; clean_sheets: number; clean_sheet: boolean; yellow_cards: number; red_cards: number; own_goals: number; total_saves: number; penalties_saved: number; penalties_missed: number; minutes_played: number; halfs_played: number; bonus_points: number; players?: { name: string; last_name: string }; matches?: { date: string } }
 
-const STAT_FIELDS = ["goals","assists","clean_sheets","yellow_cards","red_cards","own_goals","total_saves","penalties_saved","penalties_missed","minutes_played"] as const;
+const NUM_FIELDS = ["goals","assists","yellow_cards","red_cards","own_goals","total_saves","penalties_saved","penalties_missed","halfs_played","bonus_points"] as const;
 
 const PlayerMatchStats = () => {
   const [data, setData] = useState<PMS[]>([]);
@@ -18,7 +19,7 @@ const PlayerMatchStats = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<PMS | null>(null);
-  const [form, setForm] = useState<any>({ player_id: "", match_id: "", ...Object.fromEntries(STAT_FIELDS.map(f => [f, "0"])) });
+  const [form, setForm] = useState<any>({ player_id: "", match_id: "", clean_sheet: false, ...Object.fromEntries(NUM_FIELDS.map(f => [f, "0"])) });
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
@@ -37,13 +38,16 @@ const PlayerMatchStats = () => {
 
   useEffect(() => { fetchData(); }, []);
 
-  const openAdd = () => { setEditing(null); setForm({ player_id: "", match_id: "", ...Object.fromEntries(STAT_FIELDS.map(f => [f, "0"])) }); setDialogOpen(true); };
-  const openEdit = (s: PMS) => { setEditing(s); setForm({ player_id: s.player_id, match_id: s.match_id, ...Object.fromEntries(STAT_FIELDS.map(f => [f, String((s as any)[f])])) }); setDialogOpen(true); };
+  const openAdd = () => { setEditing(null); setForm({ player_id: "", match_id: "", clean_sheet: false, ...Object.fromEntries(NUM_FIELDS.map(f => [f, "0"])) }); setDialogOpen(true); };
+  const openEdit = (s: PMS) => { setEditing(s); setForm({ player_id: s.player_id, match_id: s.match_id, clean_sheet: s.clean_sheet || false, ...Object.fromEntries(NUM_FIELDS.map(f => [f, String((s as any)[f] || 0)])) }); setDialogOpen(true); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const payload = { player_id: form.player_id, match_id: form.match_id, ...Object.fromEntries(STAT_FIELDS.map(f => [f, +form[f]])) };
+    const payload: any = { player_id: form.player_id, match_id: form.match_id, clean_sheet: form.clean_sheet, ...Object.fromEntries(NUM_FIELDS.map(f => [f, +form[f]])) };
+    // Also set legacy fields for backward compatibility
+    payload.minutes_played = payload.halfs_played * 45;
+    payload.clean_sheets = payload.clean_sheet ? 1 : 0;
     const { error } = editing
       ? await supabase.from("player_match_stats").update(payload).eq("id", editing.id)
       : await supabase.from("player_match_stats").insert(payload);
@@ -64,10 +68,12 @@ const PlayerMatchStats = () => {
     { key: "match_id", label: "Match", render: (s) => s.matches?.date ?? "?" },
     { key: "goals", label: "G" },
     { key: "assists", label: "A" },
-    { key: "minutes_played", label: "Min" },
+    { key: "halfs_played", label: "Halfs" },
+    { key: "clean_sheet", label: "CS", render: (s) => s.clean_sheet ? "✓" : "" },
     { key: "yellow_cards", label: "YC" },
     { key: "red_cards", label: "RC" },
     { key: "total_saves", label: "SV" },
+    { key: "bonus_points", label: "Bonus" },
   ];
 
   return (
@@ -84,8 +90,12 @@ const PlayerMatchStats = () => {
             <Select value={form.match_id} onValueChange={v => setForm((f: any) => ({ ...f, match_id: v }))}><SelectTrigger><SelectValue placeholder="Match" /></SelectTrigger><SelectContent>{matches.map(m => <SelectItem key={m.id} value={m.id}>{m.date} - {m.team1?.name} vs {m.team2?.name}</SelectItem>)}</SelectContent></Select>
           </div>
         </div>
+        <div className="flex items-center gap-2 py-2">
+          <Switch checked={form.clean_sheet} onCheckedChange={v => setForm((f: any) => ({ ...f, clean_sheet: v }))} />
+          <Label>Clean Sheet</Label>
+        </div>
         <div className="grid grid-cols-3 gap-3">
-          {STAT_FIELDS.map(k => (
+          {NUM_FIELDS.map(k => (
             <div key={k} className="space-y-1">
               <Label className="text-xs capitalize">{k.replace(/_/g, " ")}</Label>
               <Input type="number" value={form[k]} onChange={e => setForm((f: any) => ({ ...f, [k]: e.target.value }))} />

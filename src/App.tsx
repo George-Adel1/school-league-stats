@@ -25,6 +25,8 @@ import GameWeeksPage from "./pages/GameWeeks";
 import MatchesPage from "./pages/Matches";
 import StatsPage from "./pages/Stats";
 import AnnouncementsPage from "./pages/Announcements";
+import ChipsPage from "./pages/Chips";
+import FantasyAdminPage from "./pages/FantasyAdmin";
 
 // Public pages
 import MainPage from "./pages/public/MainPage";
@@ -34,6 +36,8 @@ import MatchDetailPage from "./pages/public/MatchDetailPage";
 import PublicPlayersPage from "./pages/public/PublicPlayersPage";
 import PlayerDetailPage from "./pages/public/PlayerDetailPage";
 import ProfilePage from "./pages/public/ProfilePage";
+import FantasyPage from "./pages/public/FantasyPage";
+import LeaderboardPage from "./pages/public/LeaderboardPage";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +73,8 @@ const AppRoutes = () => {
               <Route path="matches" element={<MatchesPage />} />
               <Route path="stats" element={<StatsPage />} />
               <Route path="announcements" element={<AnnouncementsPage />} />
+              <Route path="chips" element={<ChipsPage />} />
+              <Route path="fantasy" element={<FantasyAdminPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
@@ -83,6 +89,8 @@ const AppRoutes = () => {
       <Route path="/players" element={<PublicLayout><PublicPlayersPage /></PublicLayout>} />
       <Route path="/players/:id" element={<PublicLayout><PlayerDetailPage /></PublicLayout>} />
       <Route path="/profile" element={<PublicLayout><ProfilePage /></PublicLayout>} />
+      <Route path="/fantasy" element={<PublicLayout><FantasyPage /></PublicLayout>} />
+      <Route path="/fantasy/leaderboard" element={<PublicLayout><LeaderboardPage /></PublicLayout>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
