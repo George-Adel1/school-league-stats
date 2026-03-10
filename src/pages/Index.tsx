@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, Users, Shield, Calendar, Swords, Layers, BarChart3 } from "lucide-react";
+import { Trophy, Users, Shield, Calendar, Swords, Layers, BarChart3, Star, Zap } from "lucide-react";
 
 interface CountCard { label: string; count: number; icon: React.ElementType; }
 
@@ -18,6 +18,8 @@ const Dashboard = () => {
         { table: "players", label: "Players", icon: Users },
         { table: "gameweeks", label: "Game Weeks", icon: Calendar },
         { table: "matches", label: "Matches", icon: Swords },
+        { table: "fantasy_teams", label: "Fantasy Teams", icon: Star },
+        { table: "chips", label: "Chips", icon: Zap },
       ] as const;
 
       const results = await Promise.all(
@@ -42,13 +44,13 @@ const Dashboard = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold">Fantasy League Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Optimized database — no redundant or derived columns stored</p>
+          <p className="text-sm text-muted-foreground">School League Stats & Fantasy Football Platform</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {loading ? (
-          Array.from({ length: 6 }).map((_, i) => (
+          Array.from({ length: 8 }).map((_, i) => (
             <Card key={i} className="animate-pulse"><CardContent className="p-4 h-20" /></Card>
           ))
         ) : (
@@ -66,20 +68,23 @@ const Dashboard = () => {
 
       <div className="grid md:grid-cols-2 gap-4">
         <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-primary" />Optimization Notes</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base flex items-center gap-2"><BarChart3 className="w-4 h-4 text-primary" />Fantasy System</CardTitle></CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p>✅ <strong>Match scores</strong> stored only in <code className="bg-muted px-1 rounded">team_match_stats</code> (removed from matches)</p>
-            <p>✅ <strong>Goal difference</strong> calculated dynamically as <code className="bg-muted px-1 rounded">goals_scored - goals_conceded</code></p>
-            <p>✅ <strong>Match result</strong> derived from <code className="bg-muted px-1 rounded">goals_scored vs goals_against</code></p>
+            <p>⚽ <strong>Points Engine</strong> — Calculates fantasy points per player per match based on game rules</p>
+            <p>🏆 <strong>6 Chips</strong> — 2 Captains, Wild Card, No Goalie, Bench Boost, Midfield Maestro, Aguerooooooo</p>
+            <p>💰 <strong>70M Budget</strong> — Squad: 1 GK + 3 DEF + 3 MID + 2 FWD (max 2 per class)</p>
+            <p>📊 <strong>Leaderboard</strong> — Real-time ranking of all fantasy teams</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="w-4 h-4 text-primary" />Schema Info</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base flex items-center gap-2"><Shield className="w-4 h-4 text-primary" />Point System</CardTitle></CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
-            <p>📊 <strong>10 tables</strong> with full referential integrity</p>
-            <p>🔑 All foreign keys with <code className="bg-muted px-1 rounded">ON DELETE CASCADE</code></p>
-            <p>🔒 Row-level security enabled on all tables</p>
-            <p>🚫 Zero redundant or derived columns in storage</p>
+            <p>⚽ Goals: GK=12, DEF=7, MID=4, FWD=3</p>
+            <p>🅰️ Assists: GK=7, DEF=4, MID/FWD=3</p>
+            <p>🧤 Clean sheet: GK=4, DEF=3</p>
+            <p>🟨 Yellow=-1, 🟥 Red=-3, Own Goal=-2</p>
+            <p>🥅 Penalty save=+5, Penalty miss=-3</p>
+            <p>⭐ Ref bonus: 3/2/1 pts for top 3 players</p>
           </CardContent>
         </Card>
       </div>

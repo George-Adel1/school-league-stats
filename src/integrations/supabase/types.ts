@@ -44,6 +44,225 @@ export type Database = {
         }
         Relationships: []
       }
+      chips: {
+        Row: {
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      fantasy_player_match_points: {
+        Row: {
+          breakdown: Json | null
+          id: string
+          match_id: string
+          player_id: string
+          points: number | null
+        }
+        Insert: {
+          breakdown?: Json | null
+          id?: string
+          match_id: string
+          player_id: string
+          points?: number | null
+        }
+        Update: {
+          breakdown?: Json | null
+          id?: string
+          match_id?: string
+          player_id?: string
+          points?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_player_match_points_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_player_match_points_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_team_chips: {
+        Row: {
+          chip_id: string
+          fantasy_team_id: string
+          gameweek_id: string
+          id: string
+          used_at: string | null
+        }
+        Insert: {
+          chip_id: string
+          fantasy_team_id: string
+          gameweek_id: string
+          id?: string
+          used_at?: string | null
+        }
+        Update: {
+          chip_id?: string
+          fantasy_team_id?: string
+          gameweek_id?: string
+          id?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_team_chips_chip_id_fkey"
+            columns: ["chip_id"]
+            isOneToOne: false
+            referencedRelation: "chips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_team_chips_fantasy_team_id_fkey"
+            columns: ["fantasy_team_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_team_chips_gameweek_id_fkey"
+            columns: ["gameweek_id"]
+            isOneToOne: false
+            referencedRelation: "gameweeks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_team_match_points: {
+        Row: {
+          fantasy_team_id: string
+          id: string
+          match_id: string
+          points: number | null
+        }
+        Insert: {
+          fantasy_team_id: string
+          id?: string
+          match_id: string
+          points?: number | null
+        }
+        Update: {
+          fantasy_team_id?: string
+          id?: string
+          match_id?: string
+          points?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_team_match_points_fantasy_team_id_fkey"
+            columns: ["fantasy_team_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_team_match_points_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_team_players: {
+        Row: {
+          bench_order: number | null
+          fantasy_team_id: string
+          id: string
+          is_benched: boolean | null
+          is_captain: boolean | null
+          is_vice_captain: boolean | null
+          player_id: string
+        }
+        Insert: {
+          bench_order?: number | null
+          fantasy_team_id: string
+          id?: string
+          is_benched?: boolean | null
+          is_captain?: boolean | null
+          is_vice_captain?: boolean | null
+          player_id: string
+        }
+        Update: {
+          bench_order?: number | null
+          fantasy_team_id?: string
+          id?: string
+          is_benched?: boolean | null
+          is_captain?: boolean | null
+          is_vice_captain?: boolean | null
+          player_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_team_players_fantasy_team_id_fkey"
+            columns: ["fantasy_team_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_team_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_teams: {
+        Row: {
+          budget: number | null
+          created_at: string | null
+          free_transfers: number | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          budget?: number | null
+          created_at?: string | null
+          free_transfers?: number | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          budget?: number | null
+          created_at?: string | null
+          free_transfers?: number | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_teams_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gameweeks: {
         Row: {
           end_date: string
@@ -96,6 +315,9 @@ export type Database = {
           date: string
           gameweek_id: string
           id: string
+          is_played: boolean | null
+          motm_player_id: string | null
+          season_id: string | null
           team1_id: string
           team2_id: string
         }
@@ -103,6 +325,9 @@ export type Database = {
           date: string
           gameweek_id: string
           id?: string
+          is_played?: boolean | null
+          motm_player_id?: string | null
+          season_id?: string | null
           team1_id: string
           team2_id: string
         }
@@ -110,6 +335,9 @@ export type Database = {
           date?: string
           gameweek_id?: string
           id?: string
+          is_played?: boolean | null
+          motm_player_id?: string | null
+          season_id?: string | null
           team1_id?: string
           team2_id?: string
         }
@@ -119,6 +347,20 @@ export type Database = {
             columns: ["gameweek_id"]
             isOneToOne: false
             referencedRelation: "gameweeks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_motm_player_id_fkey"
+            columns: ["motm_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
             referencedColumns: ["id"]
           },
           {
@@ -140,8 +382,11 @@ export type Database = {
       player_match_stats: {
         Row: {
           assists: number
+          bonus_points: number | null
+          clean_sheet: boolean | null
           clean_sheets: number
           goals: number
+          halfs_played: number | null
           id: string
           match_id: string
           minutes_played: number
@@ -155,8 +400,11 @@ export type Database = {
         }
         Insert: {
           assists?: number
+          bonus_points?: number | null
+          clean_sheet?: boolean | null
           clean_sheets?: number
           goals?: number
+          halfs_played?: number | null
           id?: string
           match_id: string
           minutes_played?: number
@@ -170,8 +418,11 @@ export type Database = {
         }
         Update: {
           assists?: number
+          bonus_points?: number | null
+          clean_sheet?: boolean | null
           clean_sheets?: number
           goals?: number
+          halfs_played?: number | null
           id?: string
           match_id?: string
           minutes_played?: number
@@ -200,18 +451,56 @@ export type Database = {
           },
         ]
       }
+      player_season_price: {
+        Row: {
+          id: string
+          player_id: string
+          price: number
+          season_id: string
+        }
+        Insert: {
+          id?: string
+          player_id: string
+          price?: number
+          season_id: string
+        }
+        Update: {
+          id?: string
+          player_id?: string
+          price?: number
+          season_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_season_price_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_season_price_season_id_fkey"
+            columns: ["season_id"]
+            isOneToOne: false
+            referencedRelation: "seasons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_season_stats: {
         Row: {
           assists: number
           clean_sheets: number
           goals: number
           id: string
+          matches_played: number | null
           own_goals: number
           penalties_missed: number
           penalties_saved: number
           player_id: string
           red_cards: number
           season_id: string
+          total_motm: number | null
           total_saves: number
           yellow_cards: number
         }
@@ -220,12 +509,14 @@ export type Database = {
           clean_sheets?: number
           goals?: number
           id?: string
+          matches_played?: number | null
           own_goals?: number
           penalties_missed?: number
           penalties_saved?: number
           player_id: string
           red_cards?: number
           season_id: string
+          total_motm?: number | null
           total_saves?: number
           yellow_cards?: number
         }
@@ -234,12 +525,14 @@ export type Database = {
           clean_sheets?: number
           goals?: number
           id?: string
+          matches_played?: number | null
           own_goals?: number
           penalties_missed?: number
           penalties_saved?: number
           player_id?: string
           red_cards?: number
           season_id?: string
+          total_motm?: number | null
           total_saves?: number
           yellow_cards?: number
         }
@@ -295,6 +588,21 @@ export type Database = {
           },
         ]
       }
+      positions: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -318,16 +626,22 @@ export type Database = {
       }
       seasons: {
         Row: {
+          end_date: string | null
           id: string
           number: number
+          start_date: string | null
         }
         Insert: {
+          end_date?: string | null
           id?: string
           number: number
+          start_date?: string | null
         }
         Update: {
+          end_date?: string | null
           id?: string
           number?: number
+          start_date?: string | null
         }
         Relationships: []
       }
@@ -377,6 +691,7 @@ export type Database = {
           goals_scored: number
           id: string
           losses: number
+          matches_played: number | null
           season_id: string
           team_id: string
           total_points: number
@@ -388,6 +703,7 @@ export type Database = {
           goals_scored?: number
           id?: string
           losses?: number
+          matches_played?: number | null
           season_id: string
           team_id: string
           total_points?: number
@@ -399,6 +715,7 @@ export type Database = {
           goals_scored?: number
           id?: string
           losses?: number
+          matches_played?: number | null
           season_id?: string
           team_id?: string
           total_points?: number

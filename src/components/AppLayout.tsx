@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   Trophy, Users, Shield, Calendar, Swords, BarChart3,
-  LogOut, ChevronLeft, ChevronRight, Home, Layers, Newspaper
+  LogOut, ChevronLeft, ChevronRight, Home, Layers, Newspaper, Zap, Star
 } from "lucide-react";
 import { useState } from "react";
 
@@ -17,6 +17,8 @@ const navItems = [
   { path: "/admin/matches", label: "Matches", icon: Swords },
   { path: "/admin/stats", label: "Stats", icon: BarChart3 },
   { path: "/admin/announcements", label: "News", icon: Newspaper },
+  { path: "/admin/chips", label: "Chips", icon: Zap },
+  { path: "/admin/fantasy", label: "Fantasy", icon: Star },
 ];
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
@@ -33,7 +35,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           </div>
           {!collapsed && <span className="font-bold text-sidebar-foreground text-sm truncate">Fantasy League</span>}
         </div>
-        <nav className="flex-1 p-2 space-y-1">
+        <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
           {navItems.map(item => {
             const active = location.pathname === item.path;
             return (

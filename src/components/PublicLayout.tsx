@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Trophy, BarChart3, Swords, Users, Home, LogOut, User, ChevronDown } from "lucide-react";
+import { Trophy, BarChart3, Swords, Users, Home, LogOut, User, ChevronDown, Star } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -16,6 +16,7 @@ const navItems = [
   { path: "/standings", label: "Standings", icon: BarChart3 },
   { path: "/matches", label: "Matches", icon: Swords },
   { path: "/players", label: "Players", icon: Users },
+  { path: "/fantasy", label: "Fantasy", icon: Star },
 ];
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
@@ -28,11 +29,11 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Top announcement banner */}
       <div className="w-full bg-secondary border-b border-border px-4 py-2 flex items-center justify-between">
         <p className="text-xs md:text-sm font-medium tracking-wide text-muted-foreground uppercase">
-          Think you know the best players in Don Bosco? Soon... you'll have to prove it.
+          School League Fantasy Football — Build your dream team!
         </p>
-        <span className="text-xs md:text-sm font-black text-success tracking-widest uppercase whitespace-nowrap ml-4">
-          Fantasy Coming Soon!
-        </span>
+        <Link to="/fantasy" className="text-xs md:text-sm font-black text-success tracking-widest uppercase whitespace-nowrap ml-4 hover:underline">
+          Play Fantasy →
+        </Link>
       </div>
 
       {/* Main navbar */}
@@ -81,6 +82,11 @@ const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/profile" className="flex items-center gap-2">
                       <User className="w-4 h-4" /> Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/fantasy" className="flex items-center gap-2">
+                      <Star className="w-4 h-4" /> My Fantasy Team
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
