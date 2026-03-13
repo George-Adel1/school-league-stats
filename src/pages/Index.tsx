@@ -10,6 +10,7 @@ interface CountCard { label: string; count: number; icon: React.ElementType; }
 const Dashboard = () => {
   const [counts, setCounts] = useState<CountCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchCounts = async () => {
