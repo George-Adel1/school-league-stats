@@ -262,7 +262,7 @@ const FantasyPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-success">{p.price}M</span>
+                  <span className="text-xs font-bold text-foreground">${Number(p.price).toFixed(1)}M</span>
                   <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-success" onClick={() => addPlayer(p.id)}>+</Button>
                 </div>
               </div>

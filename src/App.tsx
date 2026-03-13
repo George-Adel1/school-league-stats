@@ -64,6 +64,7 @@ const AppRoutes = () => {
         <ProtectedRoute requiredRole="admin">
           <AppLayout>
             <Routes>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<Index />} />
               <Route path="seasons" element={<SeasonsPage />} />
               <Route path="groups" element={<GroupsPage />} />
