@@ -185,7 +185,7 @@ const FantasyPage = () => {
                         <Badge variant="secondary" className="text-[10px]">{tp.players?.position}</Badge>
                         <div>
                           <p className="text-sm font-medium">{tp.players?.name} {tp.players?.last_name}</p>
-                          <p className="text-xs text-muted-foreground">{tp.players?.teams?.name} · {tp.players?.price}M</p>
+                          <p className="text-xs text-muted-foreground">{tp.players?.teams?.name} · <span className="font-bold text-foreground">${Number(tp.players?.price || 0).toFixed(1)}M</span></p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -207,10 +207,10 @@ const FantasyPage = () => {
                             <Badge variant="outline" className="text-[10px]">{tp.players?.position}</Badge>
                             <div>
                               <p className="text-sm font-medium">{tp.players?.name} {tp.players?.last_name}</p>
-                              <p className="text-xs text-muted-foreground">{tp.players?.teams?.name} · {tp.players?.price}M</p>
-                            </div>
-                          </div>
-                          <Button variant="ghost" size="sm" className="text-xs h-7 text-destructive" onClick={() => removePlayer(tp.id)}>✕</Button>
+                          <p className="text-xs text-muted-foreground">{tp.players?.teams?.name} · <span className="font-bold text-foreground">${Number(tp.players?.price || 0).toFixed(1)}M</span></p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-xs h-7 text-destructive" onClick={() => removePlayer(tp.id)}>✕</Button>
                         </div>
                       ))}
                     </>
@@ -262,7 +262,7 @@ const FantasyPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-success">{p.price}M</span>
+                  <span className="text-xs font-bold text-foreground">${Number(p.price).toFixed(1)}M</span>
                   <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-success" onClick={() => addPlayer(p.id)}>+</Button>
                 </div>
               </div>

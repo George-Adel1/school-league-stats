@@ -61,7 +61,7 @@ const PlayersPage = () => {
     { key: "name", label: "First Name" },
     { key: "last_name", label: "Last Name" },
     { key: "position", label: "Position", render: (p) => <span className="stat-badge bg-primary/10 text-primary">{p.position}</span> },
-    { key: "price", label: "Price", render: (p) => `$${p.price}` },
+    { key: "price", label: "Value", render: (p) => <span className="font-bold text-foreground">${Number(p.price).toFixed(1)}M</span> },
     { key: "team_id", label: "Team", render: (p) => p.teams?.name ?? "?" },
   ];
 

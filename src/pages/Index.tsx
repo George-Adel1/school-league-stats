@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Users, Shield, Calendar, Swords, Layers, BarChart3, Star, Zap } from "lucide-react";
+import SeasonGroupStage from "@/components/SeasonGroupStage";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface CountCard { label: string; count: number; icon: React.ElementType; }
 
 const Dashboard = () => {
   const [counts, setCounts] = useState<CountCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -87,6 +90,11 @@ const Dashboard = () => {
             <p>⭐ Ref bonus: 3/2/1 pts for top 3 players</p>
           </CardContent>
         </Card>
+      </div>
+      {/* Group Stage */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">{t("groupStage")}</h2>
+        <SeasonGroupStage />
       </div>
     </div>
   );
