@@ -91,6 +91,11 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+      {/* Group Stage */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">{t("groupStage")}</h2>
+        <SeasonGroupStage />
+      </div>
     </div>
   );
 };
