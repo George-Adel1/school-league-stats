@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export interface Column<T> {
   key: string;
@@ -19,11 +20,13 @@ interface DataTableProps<T> {
 }
 
 const DataTable = <T extends { id: string }>({ title, columns, data, onAdd, onEdit, onDelete, loading }: DataTableProps<T>) => {
+  const { t } = useLanguage();
+
   return (
     <div className="animate-fade-in">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">{title}</h2>
-        <Button onClick={onAdd} size="sm"><Plus className="w-4 h-4 mr-1" />Add</Button>
+        <Button onClick={onAdd} size="sm"><Plus className="w-4 h-4 ltr:mr-1 rtl:ml-1" />{t("add")}</Button>
       </div>
       <div className="border rounded-lg overflow-hidden bg-card">
         <Table>
@@ -32,14 +35,14 @@ const DataTable = <T extends { id: string }>({ title, columns, data, onAdd, onEd
               {columns.map(col => (
                 <TableHead key={col.key} className="font-semibold">{col.label}</TableHead>
               ))}
-              <TableHead className="w-24">Actions</TableHead>
+              <TableHead className="w-24">{t("actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">{t("loading")}</TableCell></TableRow>
             ) : data.length === 0 ? (
-              <TableRow><TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">No data yet</TableCell></TableRow>
+              <TableRow><TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">{t("noData")}</TableCell></TableRow>
             ) : (
               data.map(item => (
                 <TableRow key={item.id} className="hover:bg-muted/30 transition-colors">

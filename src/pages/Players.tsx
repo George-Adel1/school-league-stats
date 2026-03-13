@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import DataTable, { Column } from "@/components/DataTable";
 import FormDialog from "@/components/FormDialog";
 import { Input } from "@/components/ui/input";
@@ -21,13 +22,14 @@ const PlayersPage = () => {
   const [form, setForm] = useState({ name: "", last_name: "", position: "", price: "", team_id: "" });
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const fetchData = async () => {
     const [playersRes, teamsRes] = await Promise.all([
       supabase.from("players").select("*, teams(name)").order("last_name"),
       supabase.from("teams").select("*").order("name"),
     ]);
-    if (playersRes.error) toast({ title: "Error", description: playersRes.error.message, variant: "destructive" });
+    if (playersRes.error) toast({ title: t("error"), description: playersRes.error.message, variant: "destructive" });
     else setData(playersRes.data || []);
     setTeams(teamsRes.data || []);
     setLoading(false);
@@ -45,58 +47,58 @@ const PlayersPage = () => {
     const { error } = editing
       ? await supabase.from("players").update(payload).eq("id", editing.id)
       : await supabase.from("players").insert(payload);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else { setDialogOpen(false); fetchData(); }
     setSaving(false);
   };
 
   const handleDelete = async (p: Player) => {
-    if (!confirm("Delete this player?")) return;
+    if (!confirm(t("deletePlayer"))) return;
     const { error } = await supabase.from("players").delete().eq("id", p.id);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else fetchData();
   };
 
   const columns: Column<Player>[] = [
-    { key: "name", label: "First Name" },
-    { key: "last_name", label: "Last Name" },
-    { key: "position", label: "Position", render: (p) => <span className="stat-badge bg-primary/10 text-primary">{p.position}</span> },
-    { key: "price", label: "Value", render: (p) => <span className="font-bold text-foreground">${Number(p.price).toFixed(1)}M</span> },
-    { key: "team_id", label: "Team", render: (p) => p.teams?.name ?? "?" },
+    { key: "name", label: t("firstName") },
+    { key: "last_name", label: t("lastName") },
+    { key: "position", label: t("position"), render: (p) => <span className="stat-badge bg-primary/10 text-primary">{p.position}</span> },
+    { key: "price", label: t("value"), render: (p) => <span className="font-bold text-foreground">${Number(p.price).toFixed(1)}M</span> },
+    { key: "team_id", label: t("team"), render: (p) => p.teams?.name ?? "?" },
   ];
 
   return (
     <>
-      <DataTable title="Players" columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
-      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? "Edit Player" : "Add Player"} onSubmit={handleSubmit} loading={saving}>
+      <DataTable title={t("players")} columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
+      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? t("editPlayer") : t("addPlayer")} onSubmit={handleSubmit} loading={saving}>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <Label>First Name</Label>
+            <Label>{t("firstName")}</Label>
             <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
           </div>
           <div className="space-y-2">
-            <Label>Last Name</Label>
+            <Label>{t("lastName")}</Label>
             <Input value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} required />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <Label>Position</Label>
+            <Label>{t("position")}</Label>
             <Select value={form.position} onValueChange={v => setForm(f => ({ ...f, position: v }))} required>
-              <SelectTrigger><SelectValue placeholder="Position" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={t("position")} /></SelectTrigger>
               <SelectContent>{POSITIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Price</Label>
+            <Label>{t("price")}</Label>
             <Input type="number" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} required />
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Team</Label>
+          <Label>{t("team")}</Label>
           <Select value={form.team_id} onValueChange={v => setForm(f => ({ ...f, team_id: v }))} required>
-            <SelectTrigger><SelectValue placeholder="Select team" /></SelectTrigger>
-            <SelectContent>{teams.map(t => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}</SelectContent>
+            <SelectTrigger><SelectValue placeholder={t("selectTeam")} /></SelectTrigger>
+            <SelectContent>{teams.map(tm => <SelectItem key={tm.id} value={tm.id}>{tm.name}</SelectItem>)}</SelectContent>
           </Select>
         </div>
       </FormDialog>
