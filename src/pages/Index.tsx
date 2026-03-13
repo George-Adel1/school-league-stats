@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Users, Shield, Calendar, Swords, Layers, BarChart3, Star, Zap } from "lucide-react";
+import SeasonGroupStage from "@/components/SeasonGroupStage";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface CountCard { label: string; count: number; icon: React.ElementType; }
 
