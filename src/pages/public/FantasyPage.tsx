@@ -185,7 +185,7 @@ const FantasyPage = () => {
                         <Badge variant="secondary" className="text-[10px]">{tp.players?.position}</Badge>
                         <div>
                           <p className="text-sm font-medium">{tp.players?.name} {tp.players?.last_name}</p>
-                          <p className="text-xs text-muted-foreground">{tp.players?.teams?.name} · {tp.players?.price}M</p>
+                          <p className="text-xs text-muted-foreground">{tp.players?.teams?.name} · <span className="font-bold text-foreground">${Number(tp.players?.price || 0).toFixed(1)}M</span></p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
