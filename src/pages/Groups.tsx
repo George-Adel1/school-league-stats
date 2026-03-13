@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import DataTable, { Column } from "@/components/DataTable";
 import FormDialog from "@/components/FormDialog";
 import { Input } from "@/components/ui/input";
@@ -16,10 +17,11 @@ const GroupsPage = () => {
   const [number, setNumber] = useState("");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const fetchData = async () => {
     const { data, error } = await supabase.from("groups").select("*").order("number");
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else setData(data || []);
     setLoading(false);
   };
@@ -36,26 +38,26 @@ const GroupsPage = () => {
     const { error } = editing
       ? await supabase.from("groups").update(payload).eq("id", editing.id)
       : await supabase.from("groups").insert(payload);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else { setDialogOpen(false); fetchData(); }
     setSaving(false);
   };
 
   const handleDelete = async (g: Group) => {
-    if (!confirm("Delete this group?")) return;
+    if (!confirm(t("deleteGroup"))) return;
     const { error } = await supabase.from("groups").delete().eq("id", g.id);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else fetchData();
   };
 
-  const columns: Column<Group>[] = [{ key: "number", label: "Group Number" }];
+  const columns: Column<Group>[] = [{ key: "number", label: t("groupNumber") }];
 
   return (
     <>
-      <DataTable title="Groups" columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
-      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? "Edit Group" : "Add Group"} onSubmit={handleSubmit} loading={saving}>
+      <DataTable title={t("groups")} columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
+      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? t("editGroup") : t("addGroup")} onSubmit={handleSubmit} loading={saving}>
         <div className="space-y-2">
-          <Label>Group Number</Label>
+          <Label>{t("groupNumber")}</Label>
           <Input type="number" value={number} onChange={e => setNumber(e.target.value)} required />
         </div>
       </FormDialog>

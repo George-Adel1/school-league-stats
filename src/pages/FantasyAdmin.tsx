@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ const FantasyAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [calculating, setCalculating] = useState<string | null>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const fetchData = async () => {
     const [ftRes, lbRes, cuRes, mRes] = await Promise.all([
@@ -27,12 +29,9 @@ const FantasyAdmin = () => {
     setChipUsage(cuRes.data || []);
     setMatches(mRes.data || []);
 
-    // Calculate leaderboard from fantasy_team_match_points
     const { data: allPoints } = await supabase.from("fantasy_team_match_points").select("fantasy_team_id, points");
     const pointsMap: Record<string, number> = {};
-    (allPoints || []).forEach((p: any) => {
-      pointsMap[p.fantasy_team_id] = (pointsMap[p.fantasy_team_id] || 0) + p.points;
-    });
+    (allPoints || []).forEach((p: any) => { pointsMap[p.fantasy_team_id] = (pointsMap[p.fantasy_team_id] || 0) + p.points; });
 
     const lb = (lbRes.data || []).map((ft: any) => ({
       ...ft,
@@ -48,14 +47,12 @@ const FantasyAdmin = () => {
   const calculatePoints = async (matchId: string) => {
     setCalculating(matchId);
     try {
-      const { data, error } = await supabase.functions.invoke("calculate-fantasy-points", {
-        body: { match_id: matchId },
-      });
+      const { data, error } = await supabase.functions.invoke("calculate-fantasy-points", { body: { match_id: matchId } });
       if (error) throw error;
-      toast({ title: "Points Calculated", description: `${data.calculated} players processed` });
+      toast({ title: t("pointsCalculated"), description: `${data.calculated} ${t("playersProcessed")}` });
       fetchData();
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({ title: t("error"), description: err.message, variant: "destructive" });
     }
     setCalculating(null);
   };
@@ -63,23 +60,23 @@ const FantasyAdmin = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <h1 className="text-2xl font-bold flex items-center gap-2">
-        <Trophy className="w-6 h-6 text-primary" /> Fantasy Management
+        <Trophy className="w-6 h-6 text-primary" /> {t("fantasyManagement")}
       </h1>
 
       <Tabs defaultValue="leaderboard" className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full max-w-xl">
-          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-          <TabsTrigger value="teams">Teams</TabsTrigger>
-          <TabsTrigger value="calculate">Calculate</TabsTrigger>
-          <TabsTrigger value="chips">Chip Usage</TabsTrigger>
+          <TabsTrigger value="leaderboard">{t("leaderboard")}</TabsTrigger>
+          <TabsTrigger value="teams">{t("teams")}</TabsTrigger>
+          <TabsTrigger value="calculate">{t("calculate")}</TabsTrigger>
+          <TabsTrigger value="chips">{t("chipUsage")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="leaderboard">
           <Card>
-            <CardHeader><CardTitle className="text-base">Fantasy Leaderboard</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{t("fantasyLeaderboard")}</CardTitle></CardHeader>
             <CardContent>
-              {loading ? <p className="text-muted-foreground">Loading...</p> : leaderboard.length === 0 ? (
-                <p className="text-muted-foreground">No fantasy teams yet</p>
+              {loading ? <p className="text-muted-foreground">{t("loading")}</p> : leaderboard.length === 0 ? (
+                <p className="text-muted-foreground">{t("noFantasyTeams")}</p>
               ) : (
                 <div className="space-y-2">
                   {leaderboard.map((ft, i) => (
@@ -93,7 +90,7 @@ const FantasyAdmin = () => {
                           <p className="text-xs text-muted-foreground">{ft.profiles?.display_name}</p>
                         </div>
                       </div>
-                      <span className="font-bold text-lg text-primary">{ft.totalPoints} pts</span>
+                      <span className="font-bold text-lg text-primary">{ft.totalPoints} {t("pts")}</span>
                     </div>
                   ))}
                 </div>
@@ -104,10 +101,10 @@ const FantasyAdmin = () => {
 
         <TabsContent value="teams">
           <Card>
-            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Users className="w-4 h-4" /> Fantasy Teams</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Users className="w-4 h-4" /> {t("fantasyTeams")}</CardTitle></CardHeader>
             <CardContent>
               {fantasyTeams.length === 0 ? (
-                <p className="text-muted-foreground">No fantasy teams created yet</p>
+                <p className="text-muted-foreground">{t("noFantasyTeams")}</p>
               ) : (
                 <div className="space-y-4">
                   {fantasyTeams.map(ft => (
@@ -117,7 +114,7 @@ const FantasyAdmin = () => {
                           <p className="font-semibold">{ft.name}</p>
                           <p className="text-xs text-muted-foreground">{ft.profiles?.display_name} ({ft.profiles?.email})</p>
                         </div>
-                        <span className="text-xs text-muted-foreground">{ft.fantasy_team_players?.length || 0} players</span>
+                        <span className="text-xs text-muted-foreground">{ft.fantasy_team_players?.length || 0} {t("players")}</span>
                       </div>
                       {ft.fantasy_team_players?.length > 0 && (
                         <div className="grid grid-cols-3 gap-1 mt-2">
@@ -141,9 +138,9 @@ const FantasyAdmin = () => {
 
         <TabsContent value="calculate">
           <Card>
-            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Calculator className="w-4 h-4" /> Calculate Match Points</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Calculator className="w-4 h-4" /> {t("calculateMatchPoints")}</CardTitle></CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">Click "Calculate" on a match to compute fantasy points based on player stats.</p>
+              <p className="text-sm text-muted-foreground mb-4">{t("calculateDesc")}</p>
               <div className="space-y-2">
                 {matches.map(m => (
                   <div key={m.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
@@ -160,7 +157,7 @@ const FantasyAdmin = () => {
                       onClick={() => calculatePoints(m.id)}
                       disabled={calculating === m.id}
                     >
-                      {calculating === m.id ? "Calculating..." : m.is_played ? "Recalculate" : "Calculate"}
+                      {calculating === m.id ? t("calculating") : m.is_played ? t("recalculate") : t("calculate")}
                     </Button>
                   </div>
                 ))}
@@ -171,10 +168,10 @@ const FantasyAdmin = () => {
 
         <TabsContent value="chips">
           <Card>
-            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4" /> Chip Usage History</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Zap className="w-4 h-4" /> {t("chipUsage")}</CardTitle></CardHeader>
             <CardContent>
               {chipUsage.length === 0 ? (
-                <p className="text-muted-foreground">No chips used yet</p>
+                <p className="text-muted-foreground">{t("noChipsUsed")}</p>
               ) : (
                 <div className="space-y-2">
                   {chipUsage.map(cu => (

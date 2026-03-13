@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import DataTable, { Column } from "@/components/DataTable";
 import FormDialog from "@/components/FormDialog";
 import { Input } from "@/components/ui/input";
@@ -17,10 +18,11 @@ const ChipsPage = () => {
   const [form, setForm] = useState({ name: "", description: "" });
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const fetchData = async () => {
     const { data, error } = await supabase.from("chips").select("*").order("name");
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else setData(data || []);
     setLoading(false);
   };
@@ -37,33 +39,33 @@ const ChipsPage = () => {
     const { error } = editing
       ? await supabase.from("chips").update(payload).eq("id", editing.id)
       : await supabase.from("chips").insert(payload);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else { setDialogOpen(false); fetchData(); }
     setSaving(false);
   };
 
   const handleDelete = async (c: Chip) => {
-    if (!confirm("Delete this chip?")) return;
+    if (!confirm(t("deleteChip"))) return;
     const { error } = await supabase.from("chips").delete().eq("id", c.id);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else fetchData();
   };
 
   const columns: Column<Chip>[] = [
-    { key: "name", label: "Chip Name" },
-    { key: "description", label: "Description", render: (c) => <span className="text-muted-foreground text-xs line-clamp-2">{c.description || "—"}</span> },
+    { key: "name", label: t("chipName") },
+    { key: "description", label: t("description"), render: (c) => <span className="text-muted-foreground text-xs line-clamp-2">{c.description || "—"}</span> },
   ];
 
   return (
     <>
-      <DataTable title="Chips" columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
-      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? "Edit Chip" : "Add Chip"} onSubmit={handleSubmit} loading={saving}>
+      <DataTable title={t("chips")} columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
+      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? t("editChip") : t("addChip")} onSubmit={handleSubmit} loading={saving}>
         <div className="space-y-2">
-          <Label>Chip Name</Label>
+          <Label>{t("chipName")}</Label>
           <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
         </div>
         <div className="space-y-2">
-          <Label>Description</Label>
+          <Label>{t("description")}</Label>
           <Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={3} />
         </div>
       </FormDialog>

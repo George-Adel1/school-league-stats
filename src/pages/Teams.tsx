@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/useLanguage";
 import DataTable, { Column } from "@/components/DataTable";
 import FormDialog from "@/components/FormDialog";
 import { Input } from "@/components/ui/input";
@@ -20,13 +21,14 @@ const TeamsPage = () => {
   const [groupId, setGroupId] = useState("");
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const fetchData = async () => {
     const [teamsRes, groupsRes] = await Promise.all([
       supabase.from("teams").select("*, groups(number)").order("name"),
       supabase.from("groups").select("*").order("number"),
     ]);
-    if (teamsRes.error) toast({ title: "Error", description: teamsRes.error.message, variant: "destructive" });
+    if (teamsRes.error) toast({ title: t("error"), description: teamsRes.error.message, variant: "destructive" });
     else setData(teamsRes.data || []);
     setGroups(groupsRes.data || []);
     setLoading(false);
@@ -35,7 +37,7 @@ const TeamsPage = () => {
   useEffect(() => { fetchData(); }, []);
 
   const openAdd = () => { setEditing(null); setName(""); setGroupId(""); setDialogOpen(true); };
-  const openEdit = (t: Team) => { setEditing(t); setName(t.name); setGroupId(t.group_id); setDialogOpen(true); };
+  const openEdit = (tm: Team) => { setEditing(tm); setName(tm.name); setGroupId(tm.group_id); setDialogOpen(true); };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,37 +46,37 @@ const TeamsPage = () => {
     const { error } = editing
       ? await supabase.from("teams").update(payload).eq("id", editing.id)
       : await supabase.from("teams").insert(payload);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else { setDialogOpen(false); fetchData(); }
     setSaving(false);
   };
 
-  const handleDelete = async (t: Team) => {
-    if (!confirm("Delete this team?")) return;
-    const { error } = await supabase.from("teams").delete().eq("id", t.id);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+  const handleDelete = async (tm: Team) => {
+    if (!confirm(t("deleteTeam"))) return;
+    const { error } = await supabase.from("teams").delete().eq("id", tm.id);
+    if (error) toast({ title: t("error"), description: error.message, variant: "destructive" });
     else fetchData();
   };
 
   const columns: Column<Team>[] = [
-    { key: "name", label: "Team Name" },
-    { key: "group_id", label: "Group", render: (t) => `Group ${t.groups?.number ?? "?"}` },
+    { key: "name", label: t("teamName") },
+    { key: "group_id", label: t("group"), render: (tm) => `${t("group")} ${tm.groups?.number ?? "?"}` },
   ];
 
   return (
     <>
-      <DataTable title="Teams" columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
-      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? "Edit Team" : "Add Team"} onSubmit={handleSubmit} loading={saving}>
+      <DataTable title={t("teams")} columns={columns} data={data} onAdd={openAdd} onEdit={openEdit} onDelete={handleDelete} loading={loading} />
+      <FormDialog open={dialogOpen} onOpenChange={setDialogOpen} title={editing ? t("editTeam") : t("addTeam")} onSubmit={handleSubmit} loading={saving}>
         <div className="space-y-2">
-          <Label>Team Name</Label>
+          <Label>{t("teamName")}</Label>
           <Input value={name} onChange={e => setName(e.target.value)} required />
         </div>
         <div className="space-y-2">
-          <Label>Group</Label>
+          <Label>{t("group")}</Label>
           <Select value={groupId} onValueChange={setGroupId} required>
-            <SelectTrigger><SelectValue placeholder="Select group" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t("selectGroup")} /></SelectTrigger>
             <SelectContent>
-              {groups.map(g => <SelectItem key={g.id} value={g.id}>Group {g.number}</SelectItem>)}
+              {groups.map(g => <SelectItem key={g.id} value={g.id}>{t("group")} {g.number}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
